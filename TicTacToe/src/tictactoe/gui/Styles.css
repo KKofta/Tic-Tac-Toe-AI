@@ -6,6 +6,7 @@
     -fx-background-color: #7CAFC2;
     -fx-text-fill: whitesmoke;
     -fx-background-radius: 10px;
+    -fx-font-size: 14px
 }
 
 .button:hover {
@@ -26,4 +27,38 @@
 
 Line {
     -fx-stroke: whitesmoke;
+}
+
+.label {
+    -fx-text-fill: whitesmoke;
+    -fx-font-size: 16px;
+}
+
+#alone-button {
+    -fx-background-color: #A1B56C;
+}
+
+#alone-button:hover {
+    -fx-background-color: whitesmoke;
+    -fx-text-fill: #A1B56C;
+}
+
+#randfirst-button, #randsecond-button {
+    -fx-background-color: #DC9656;
+}
+
+#randfirst-button:hover, 
+#randsecond-button:hover {
+    -fx-background-color: whitesmoke;
+    -fx-text-fill: #DC9656;
+}
+
+#aifirst-button, #aisecond-button {
+    -fx-background-color: #AB4642;
+}
+
+#aifirst-button:hover, 
+#aisecond-button:hover {
+    -fx-background-color: whitesmoke;
+    -fx-text-fill: #AB4642;
 }
