@@ -4,7 +4,11 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
@@ -20,20 +24,24 @@ import javafx.stage.Stage;
 public class GUICreation extends Application {
 
     private final Stage window = new Stage();
-    
-    boolean blockX = false;
-    boolean blockO = false;
+    private BorderPane layout;
+    private GridPane game;
+
+    private boolean blockX = false;
+    private boolean blockO = false;
+
+    char[][] gameLogic = new char[3][3];
 
     @Override
     public void start(Stage stage) throws Exception {
         stage = window;
 
-        BorderPane layout = new BorderPane();
+        layout = new BorderPane();
 
         VBox title = createTitle();
         layout.setTop(title);
 
-        GridPane game = createGameArea();
+        game = createGameArea();
         layout.setCenter(game);
 
         VBox menu = createMenu();
@@ -81,37 +89,52 @@ public class GUICreation extends Application {
                 rec.setFill(Color.TRANSPARENT);
                 rec.setStroke(Color.WHITESMOKE);
 
-                Text text = new Text();
-                GridPane.setRowIndex(text, i);
-                GridPane.setColumnIndex(text, j);
+                Text recText = new Text();
+                GridPane.setRowIndex(recText, i);
+                GridPane.setColumnIndex(recText, j);
 
-                setCellAction(rec, text);
+                setCellAction(rec, recText);
 
-                game.getChildren().addAll(rec, text);
+                game.getChildren().addAll(rec, recText);
             }
         }
+
         return game;
     }
 
-    private void setCellAction(Rectangle rec, Text text) {
+    private void setCellAction(Rectangle rec, Text recText) {
 
-        text.setFont(Font.font(85));
-        text.setFill(Color.WHITESMOKE);
+        recText.setFont(Font.font(85));
+        recText.setFill(Color.WHITESMOKE);
 
         rec.setOnMouseClicked(event -> {
 
-            if (event.getButton() == MouseButton.PRIMARY && blockX == false) {
-                text.setText("  X");
+            if (event.getButton() == MouseButton.PRIMARY && blockX == false && recText.getText().isEmpty()) {
+                recText.setText("  X");
+                int i = GridPane.getRowIndex(rec);
+                int j = GridPane.getColumnIndex(rec);
+                gameLogic[i][j] = 'X';
+                //System.out.println(i + "," + j);
+                //System.out.println(Arrays.deepToString(gameLogic));
                 blockX = true;
                 blockO = false;
-                
-            } else if (event.getButton() == MouseButton.SECONDARY && blockO == false) {
-                text.setText("  O");
+
+                checkGameState();
+
+            } else if (event.getButton() == MouseButton.SECONDARY && blockO == false && recText.getText().isEmpty()) {
+                recText.setText("  O");
+                int i = GridPane.getRowIndex(rec);
+                int j = GridPane.getColumnIndex(rec);
+                gameLogic[i][j] = 'O';
+                //System.out.println(i + "," + j);
+                //System.out.println(Arrays.deepToString(gameLogic));
                 blockO = true;
                 blockX = false;
+
+                checkGameState();
+
             }
         });
-
     }
 
     private VBox createMenu() {
@@ -124,6 +147,7 @@ public class GUICreation extends Application {
         Button aloneButton = new Button("Play alone");
         menu.setMargin(aloneButton, new Insets(100, 0, 0, 0));
         aloneButton.setId("alone-button");
+        setAloneButtonAction(aloneButton);
 
         Label randomLabel = new Label("Play with random:");
         Button randomFirstButton = new Button("Go first");
@@ -149,7 +173,101 @@ public class GUICreation extends Application {
 
         return menu;
     }
-    
-    
-    
+
+    private void setAloneButtonAction(Button button) {
+
+        button.setOnAction(event -> {
+            clearOldGame();
+        });
+    }
+
+    private void clearOldGame() {
+
+        blockX = false;
+        blockO = false;
+        game = createGameArea();
+        layout.setCenter(game);
+
+        for (int row = 0; row < gameLogic.length; row++) {
+            for (int col = 0; col < gameLogic.length; col++) {
+                gameLogic[row][col] = 0;
+            }
+        }
+    }
+
+    private void checkGameState() {
+
+        //check rows
+        for (int row = 0; row < gameLogic.length; row++) {
+            if (gameLogic[row][0] != 0 && gameLogic[row][0] == gameLogic[row][1] && gameLogic[row][1] == gameLogic[row][2]) {
+                if (gameLogic[row][0] == 'X') {
+                    displayMessage("Player X won!");
+                    blockX = true;
+                    blockO = true;
+                } else {
+                    displayMessage("Player O won!");
+                    blockX = true;
+                    blockO = true;
+                }
+            }
+        }
+
+        //check columns
+        for (int col = 0; col < gameLogic.length; col++) {
+            if (gameLogic[0][col] != 0 && gameLogic[0][col] == gameLogic[1][col] && gameLogic[1][col] == gameLogic[2][col]) {
+                if (gameLogic[0][col] == 'X') {
+                    displayMessage("Player X won!");
+                    blockX = true;
+                    blockO = true;
+                } else {
+                    displayMessage("Player O won!");
+                    blockX = true;
+                    blockO = true;
+                }
+            }
+        }
+
+        //check diagonals
+        if (gameLogic[0][0] != 0 && gameLogic[0][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[2][2]) {
+            if (gameLogic[0][0] == 'X') {
+                displayMessage("Player X won!");
+                blockX = true;
+                blockO = true;
+            } else {
+                displayMessage("Player O won!");
+                blockX = true;
+                blockO = true;
+            }
+        }
+
+        if (gameLogic[2][0] != 0 && gameLogic[2][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[0][2]) {
+            if (gameLogic[2][0] == 'X') {
+                displayMessage("Player X won!");
+                blockX = true;
+                blockO = true;
+            } else {
+                displayMessage("Player O won!");
+                blockX = true;
+                blockO = true;
+            }
+        }
+
+    }
+
+    private void displayMessage(String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Message");
+        alert.setHeaderText("Game over!");
+        alert.setContentText(message);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("Styles.css").toExternalForm());
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                alert.close();
+            }
+        });
+    }
+
 }
