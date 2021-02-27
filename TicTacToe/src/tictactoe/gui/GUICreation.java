@@ -6,21 +6,27 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class GUICreation extends Application {
 
+    private final Stage window = new Stage();
+    
+    boolean blockX = false;
+    boolean blockO = false;
+
     @Override
     public void start(Stage stage) throws Exception {
+        stage = window;
 
         BorderPane layout = new BorderPane();
 
@@ -36,9 +42,9 @@ public class GUICreation extends Application {
         Scene scene = new Scene(layout, 650, 600);
         scene.getStylesheets().add(getClass().getResource("Styles.css").toExternalForm());
 
-        stage.setTitle("TicTacToe with AI");
-        stage.setScene(scene);
-        stage.show();
+        window.setTitle("TicTacToe with AI");
+        window.setScene(scene);
+        window.show();
     }
 
     private VBox createTitle() {
@@ -56,37 +62,69 @@ public class GUICreation extends Application {
     }
 
     private GridPane createGameArea() {
-        GridPane game = new GridPane();
-        game.setGridLinesVisible(true);
-        game.setPadding(new Insets(10, 15, 15, 15));
 
         final int numCols = 3;
         final int numRows = 3;
-        for (int i = 0; i < numCols; i++) {
-            ColumnConstraints colConst = new ColumnConstraints(100);
-            colConst.setPercentWidth(100.0 / numCols);
-            game.getColumnConstraints().add(colConst);
-        }
-        for (int i = 0; i < numRows; i++) {
-            RowConstraints rowConst = new RowConstraints();
-            rowConst.setPercentHeight(100.0 / numRows);
-            game.getRowConstraints().add(rowConst);
-        }
+        final int gameSize = 450;
+        final int cellSize = gameSize / 3;
 
+        GridPane game = new GridPane();
+
+        game.setMinSize(gameSize, gameSize);
+        game.setPadding(new Insets(10, 15, 15, 15));
+
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                Rectangle rec = new Rectangle(cellSize, cellSize);
+                GridPane.setRowIndex(rec, i);
+                GridPane.setColumnIndex(rec, j);
+                rec.setFill(Color.TRANSPARENT);
+                rec.setStroke(Color.WHITESMOKE);
+
+                Text text = new Text();
+                GridPane.setRowIndex(text, i);
+                GridPane.setColumnIndex(text, j);
+
+                setCellAction(rec, text);
+
+                game.getChildren().addAll(rec, text);
+            }
+        }
         return game;
+    }
+
+    private void setCellAction(Rectangle rec, Text text) {
+
+        text.setFont(Font.font(85));
+        text.setFill(Color.WHITESMOKE);
+
+        rec.setOnMouseClicked(event -> {
+
+            if (event.getButton() == MouseButton.PRIMARY && blockX == false) {
+                text.setText("  X");
+                blockX = true;
+                blockO = false;
+                
+            } else if (event.getButton() == MouseButton.SECONDARY && blockO == false) {
+                text.setText("  O");
+                blockO = true;
+                blockX = false;
+            }
+        });
+
     }
 
     private VBox createMenu() {
         VBox menu = new VBox(20);
         menu.setAlignment(Pos.CENTER);
         menu.setPadding(new Insets(10, 15, 15, 15));
-        
+
         Button infoButton = new Button("Information");
 
         Button aloneButton = new Button("Play alone");
         menu.setMargin(aloneButton, new Insets(100, 0, 0, 0));
         aloneButton.setId("alone-button");
-        
+
         Label randomLabel = new Label("Play with random:");
         Button randomFirstButton = new Button("Go first");
         randomFirstButton.setId("randfirst-button");
@@ -94,7 +132,7 @@ public class GUICreation extends Application {
         randomSecondButton.setId("randsecond-button");
         HBox randomBox = new HBox(10);
         randomBox.getChildren().addAll(randomFirstButton, randomSecondButton);
-        
+
         Label aiLabel = new Label("Play with AI:");
         Button aiFirstButton = new Button("Go first");
         aiFirstButton.setId("aifirst-button");
@@ -102,13 +140,16 @@ public class GUICreation extends Application {
         aiSecondButton.setId("aisecond-button");
         HBox aiBox = new HBox(10);
         aiBox.getChildren().addAll(aiFirstButton, aiSecondButton);
-        
+
         Button exitButton = new Button("Exit");
+        exitButton.setOnAction(e -> window.close());
 
         menu.setMargin(exitButton, new Insets(100, 0, 0, 0));
-        menu.getChildren().addAll(infoButton, aloneButton, randomLabel, randomBox , aiLabel, aiBox ,exitButton);
+        menu.getChildren().addAll(infoButton, aloneButton, randomLabel, randomBox, aiLabel, aiBox, exitButton);
 
         return menu;
     }
-
+    
+    
+    
 }
