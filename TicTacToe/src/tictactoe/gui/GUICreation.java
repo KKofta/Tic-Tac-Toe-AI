@@ -21,8 +21,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import tictactoe.cumputerMove.ComputerMove;
-import tictactoe.cumputerMove.ComputerMoveInterface;
+import tictactoe.computerMove.ComputerMove;
+import tictactoe.computerMove.ComputerMoveInterface;
 
 public class GUICreation extends Application {
 

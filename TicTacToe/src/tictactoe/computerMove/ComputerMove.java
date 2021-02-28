@@ -1,4 +1,4 @@
-package tictactoe.cumputerMove;
+package tictactoe.computerMove;
 
 import java.util.ArrayList;
 import java.util.Random;
