@@ -1,5 +1,6 @@
 package tictactoe.gui;
 
+import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,6 +21,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import tictactoe.cumputerMove.ComputerMove;
+import tictactoe.cumputerMove.ComputerMoveInterface;
 
 public class GUICreation extends Application {
 
@@ -27,10 +30,15 @@ public class GUICreation extends Application {
     private BorderPane layout;
     private GridPane game;
 
-    private boolean blockX = false;
-    private boolean blockO = false;
+    private boolean blockX = true;
+    private boolean blockO = true;
+    private boolean gameFinished = false;
+
+    private boolean randomMode = false;
+    private boolean aiMode = false;
 
     char[][] gameLogic = new char[3][3];
+    ArrayList<Integer> cellsList = new ArrayList<>();
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -111,28 +119,63 @@ public class GUICreation extends Application {
 
             if (event.getButton() == MouseButton.PRIMARY && blockX == false && recText.getText().isEmpty()) {
                 recText.setText("  X");
-                int i = GridPane.getRowIndex(rec);
-                int j = GridPane.getColumnIndex(rec);
-                gameLogic[i][j] = 'X';
+                int row = GridPane.getRowIndex(rec);
+                int col = GridPane.getColumnIndex(rec);
+                gameLogic[row][col] = 'X';
+                updateCellList(row, col);
+                checkGameState();
+
+                if (randomMode && !gameFinished) {
+                    System.out.println(cellsList);
+
+                    if (!cellsList.isEmpty()) {
+                        findRandomPlace("  O");
+                    }
+                    checkGameState();
+                    blockO = true;
+
+                } else if (aiMode && !gameFinished) {
+                    System.out.println(cellsList);
+
+                    checkGameState();
+                    blockO = true;
+
+                } else if (!gameFinished) {
+                    blockX = true;
+                    blockO = false;
+                }
                 //System.out.println(i + "," + j);
                 //System.out.println(Arrays.deepToString(gameLogic));
-                blockX = true;
-                blockO = false;
-
-                checkGameState();
 
             } else if (event.getButton() == MouseButton.SECONDARY && blockO == false && recText.getText().isEmpty()) {
                 recText.setText("  O");
-                int i = GridPane.getRowIndex(rec);
-                int j = GridPane.getColumnIndex(rec);
-                gameLogic[i][j] = 'O';
-                //System.out.println(i + "," + j);
-                //System.out.println(Arrays.deepToString(gameLogic));
-                blockO = true;
-                blockX = false;
-
+                int row = GridPane.getRowIndex(rec);
+                int col = GridPane.getColumnIndex(rec);
+                gameLogic[row][col] = 'O';
+                updateCellList(row, col);
                 checkGameState();
 
+                if (randomMode && !gameFinished) {
+                    System.out.println(cellsList);
+
+                    if (!cellsList.isEmpty()) {
+                        findRandomPlace("  X");
+                    }
+                    checkGameState();
+                    blockX = true;
+
+                } else if (aiMode && !gameFinished) {
+                    System.out.println(cellsList);
+
+                    checkGameState();
+                    blockX = true;
+
+                } else {
+                    blockX = false;
+                    blockO = true;
+                }
+                //System.out.println(i + "," + j);
+                //System.out.println(Arrays.deepToString(gameLogic));
             }
         });
     }
@@ -152,16 +195,24 @@ public class GUICreation extends Application {
         Label randomLabel = new Label("Play with random:");
         Button randomFirstButton = new Button("Go first");
         randomFirstButton.setId("randfirst-button");
+        setRandomFirstButtonAction(randomFirstButton);
+
         Button randomSecondButton = new Button("Go second");
         randomSecondButton.setId("randsecond-button");
+        setRandomSecondButtonAction(randomSecondButton);
+
         HBox randomBox = new HBox(10);
         randomBox.getChildren().addAll(randomFirstButton, randomSecondButton);
 
         Label aiLabel = new Label("Play with AI:");
         Button aiFirstButton = new Button("Go first");
         aiFirstButton.setId("aifirst-button");
+        setAiFirstButtonAction(aiFirstButton);
+
         Button aiSecondButton = new Button("Go second");
         aiSecondButton.setId("aisecond-button");
+        setAiSecondButtonAciton(aiSecondButton);
+
         HBox aiBox = new HBox(10);
         aiBox.getChildren().addAll(aiFirstButton, aiSecondButton);
 
@@ -185,6 +236,9 @@ public class GUICreation extends Application {
 
         blockX = false;
         blockO = false;
+        gameFinished = false;
+        randomMode = false;
+        aiMode = false;
         game = createGameArea();
         layout.setCenter(game);
 
@@ -193,65 +247,96 @@ public class GUICreation extends Application {
                 gameLogic[row][col] = 0;
             }
         }
+
+        final int numberOfCells = gameLogic.length * gameLogic.length;
+        cellsList.clear();
+        for (int i = 0; i < numberOfCells; i++) {
+            cellsList.add(i);
+        }
+        System.out.println(cellsList);
     }
 
     private void checkGameState() {
 
+        boolean noTie = false;
         //check rows
-        for (int row = 0; row < gameLogic.length; row++) {
-            if (gameLogic[row][0] != 0 && gameLogic[row][0] == gameLogic[row][1] && gameLogic[row][1] == gameLogic[row][2]) {
-                if (gameLogic[row][0] == 'X') {
-                    displayMessage("Player X won!");
+        if (noTie == false) {
+            for (int row = 0; row < gameLogic.length; row++) {
+                if (gameLogic[row][0] != 0 && gameLogic[row][0] == gameLogic[row][1] && gameLogic[row][1] == gameLogic[row][2]) {
+                    if (gameLogic[row][0] == 'X') {
+                        displayMessage("Player X won!");
+                    } else {
+                        displayMessage("Player O won!");
+                    }
                     blockX = true;
                     blockO = true;
-                } else {
-                    displayMessage("Player O won!");
-                    blockX = true;
-                    blockO = true;
+                    gameFinished = true;
+                    noTie = true;
                 }
             }
         }
 
         //check columns
-        for (int col = 0; col < gameLogic.length; col++) {
-            if (gameLogic[0][col] != 0 && gameLogic[0][col] == gameLogic[1][col] && gameLogic[1][col] == gameLogic[2][col]) {
-                if (gameLogic[0][col] == 'X') {
-                    displayMessage("Player X won!");
+        if (noTie == false) {
+            for (int col = 0; col < gameLogic.length; col++) {
+                if (gameLogic[0][col] != 0 && gameLogic[0][col] == gameLogic[1][col] && gameLogic[1][col] == gameLogic[2][col]) {
+                    if (gameLogic[0][col] == 'X') {
+                        displayMessage("Player X won!");
+                    } else {
+                        displayMessage("Player O won!");
+                    }
                     blockX = true;
                     blockO = true;
-                } else {
-                    displayMessage("Player O won!");
-                    blockX = true;
-                    blockO = true;
+                    gameFinished = true;
+                    noTie = true;
                 }
             }
         }
 
         //check diagonals
-        if (gameLogic[0][0] != 0 && gameLogic[0][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[2][2]) {
-            if (gameLogic[0][0] == 'X') {
-                displayMessage("Player X won!");
+        if (noTie == false) {
+            if (gameLogic[0][0] != 0 && gameLogic[0][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[2][2]) {
+                if (gameLogic[0][0] == 'X') {
+                    displayMessage("Player X won!");
+                } else {
+                    displayMessage("Player O won!");
+                }
                 blockX = true;
                 blockO = true;
-            } else {
-                displayMessage("Player O won!");
-                blockX = true;
-                blockO = true;
+                gameFinished = true;
+                noTie = true;
             }
         }
 
-        if (gameLogic[2][0] != 0 && gameLogic[2][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[0][2]) {
-            if (gameLogic[2][0] == 'X') {
-                displayMessage("Player X won!");
+        if (noTie == false) {
+            if (gameLogic[2][0] != 0 && gameLogic[2][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[0][2]) {
+                if (gameLogic[2][0] == 'X') {
+                    displayMessage("Player X won!");
+                } else {
+                    displayMessage("Player O won!");
+                }
                 blockX = true;
                 blockO = true;
-            } else {
-                displayMessage("Player O won!");
-                blockX = true;
-                blockO = true;
+                gameFinished = true;
+                noTie = true;
             }
         }
 
+        //check if there is a tie
+        if (noTie == false) {
+            int checkForTie = 0;
+            for (int row = 0; row < gameLogic.length; row++) {
+                for (int col = 0; col < gameLogic.length; col++) {
+                    if (gameLogic[row][col] != 0) {
+                        checkForTie++;
+                    }
+                }
+            }
+            if (checkForTie == 9) {
+                displayMessage("There was a tie!");
+                gameFinished = true;
+            }
+        }
     }
 
     private void displayMessage(String message) {
@@ -270,4 +355,111 @@ public class GUICreation extends Application {
         });
     }
 
+    private void updateCellList(int row, int col) {
+        if (row == 0) {
+            cellsList.remove(new Integer(col));
+        } else if (row == 1) {
+            cellsList.remove(new Integer(col + 3));
+        } else if (row == 2) {
+            cellsList.remove(new Integer(col + 6));
+        }
+    }
+
+    private void findRandomPlace(String text) {
+
+        ComputerMoveInterface computerMove = new ComputerMove();
+        int randomNumber = computerMove.randomMove(cellsList);
+
+        int row = 0;
+        int col = 0;
+        if (randomNumber < 3) {
+            row = 0;
+            if (randomNumber == 0) {
+                col = 0;
+            } else if (randomNumber == 1) {
+                col = 1;
+            } else if (randomNumber == 2) {
+                col = 2;
+            }
+        } else if (randomNumber >= 3 && randomNumber < 6) {
+            row = 1;
+            if (randomNumber == 3) {
+                col = 0;
+            } else if (randomNumber == 4) {
+                col = 1;
+            } else if (randomNumber == 5) {
+                col = 2;
+            }
+        } else if (randomNumber >= 6) {
+            row = 2;
+            if (randomNumber == 6) {
+                col = 0;
+            } else if (randomNumber == 7) {
+                col = 1;
+            } else if (randomNumber == 8) {
+                col = 2;
+            }
+        }
+        System.out.println("Row: " + row + " Col: " + col);
+
+        gameLogic[row][col] = text.charAt(text.length() - 1);
+        replaceTextNodes(row, col, text);
+        updateCellList(row, col);
+    }
+
+    private void replaceTextNodes(int rowIndex, int colIndex, String text) {
+        //game.getChildren().remove(nodeIndex); //możliwe, że niepotrzebne
+
+        Text recText = new Text();
+        recText.setFont(Font.font(85));
+        recText.setFill(Color.WHITESMOKE);
+        recText.setText(text);
+        GridPane.setRowIndex(recText, rowIndex);
+        GridPane.setColumnIndex(recText, colIndex);
+
+        //game.getChildren().add(nodeIndex, recText);
+        game.getChildren().add(recText);
+    }
+
+    private void setRandomFirstButtonAction(Button randomFirstButton) {
+
+        randomFirstButton.setOnAction(event -> {
+            clearOldGame();
+            randomMode = true;
+        });
+
+    }
+
+    private void setRandomSecondButtonAction(Button randomSecondButton) {
+
+        randomSecondButton.setOnAction(event -> {
+            clearOldGame();
+            randomMode = true;
+
+            System.out.println(cellsList);
+
+            if (!cellsList.isEmpty()) {
+                findRandomPlace("  O");
+            }
+            blockO = true;
+        });
+    }
+
+    private void setAiFirstButtonAction(Button aiFirstButton) {
+
+        aiFirstButton.setOnAction(event -> {
+            clearOldGame();
+            aiMode = true;
+        });
+
+    }
+
+    private void setAiSecondButtonAciton(Button aiSecondButton) {
+
+        aiSecondButton.setOnAction(event -> {
+            clearOldGame();
+            aiMode = true;
+        });
+
+    }
 }
