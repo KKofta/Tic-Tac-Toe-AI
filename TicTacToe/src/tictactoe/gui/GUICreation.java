@@ -77,109 +77,6 @@ public class GUICreation extends Application {
         return title;
     }
 
-    private GridPane createGameArea() {
-
-        final int numCols = 3;
-        final int numRows = 3;
-        final int gameSize = 450;
-        final int cellSize = gameSize / 3;
-
-        GridPane game = new GridPane();
-
-        game.setMinSize(gameSize, gameSize);
-        game.setPadding(new Insets(10, 15, 15, 15));
-
-        for (int i = 0; i < numRows; i++) {
-            for (int j = 0; j < numCols; j++) {
-                Rectangle rec = new Rectangle(cellSize, cellSize);
-                GridPane.setRowIndex(rec, i);
-                GridPane.setColumnIndex(rec, j);
-                rec.setFill(Color.TRANSPARENT);
-                rec.setStroke(Color.WHITESMOKE);
-
-                Text recText = new Text();
-                GridPane.setRowIndex(recText, i);
-                GridPane.setColumnIndex(recText, j);
-
-                setCellAction(rec, recText);
-
-                game.getChildren().addAll(rec, recText);
-            }
-        }
-
-        return game;
-    }
-
-    private void setCellAction(Rectangle rec, Text recText) {
-
-        recText.setFont(Font.font(85));
-        recText.setFill(Color.WHITESMOKE);
-
-        rec.setOnMouseClicked(event -> {
-
-            if (event.getButton() == MouseButton.PRIMARY && blockX == false && recText.getText().isEmpty()) {
-                recText.setText("  X");
-                int row = GridPane.getRowIndex(rec);
-                int col = GridPane.getColumnIndex(rec);
-                gameLogic[row][col] = 'X';
-                updateCellList(row, col);
-                checkGameState();
-
-                if (randomMode && !gameFinished) {
-                    System.out.println(cellsList);
-
-                    if (!cellsList.isEmpty()) {
-                        findRandomPlace("  O");
-                    }
-                    checkGameState();
-                    blockO = true;
-
-                } else if (aiMode && !gameFinished) {
-                    System.out.println(cellsList);
-
-                    checkGameState();
-                    blockO = true;
-
-                } else if (!gameFinished) {
-                    blockX = true;
-                    blockO = false;
-                }
-                //System.out.println(i + "," + j);
-                //System.out.println(Arrays.deepToString(gameLogic));
-
-            } else if (event.getButton() == MouseButton.SECONDARY && blockO == false && recText.getText().isEmpty()) {
-                recText.setText("  O");
-                int row = GridPane.getRowIndex(rec);
-                int col = GridPane.getColumnIndex(rec);
-                gameLogic[row][col] = 'O';
-                updateCellList(row, col);
-                checkGameState();
-
-                if (randomMode && !gameFinished) {
-                    System.out.println(cellsList);
-
-                    if (!cellsList.isEmpty()) {
-                        findRandomPlace("  X");
-                    }
-                    checkGameState();
-                    blockX = true;
-
-                } else if (aiMode && !gameFinished) {
-                    System.out.println(cellsList);
-
-                    checkGameState();
-                    blockX = true;
-
-                } else {
-                    blockX = false;
-                    blockO = true;
-                }
-                //System.out.println(i + "," + j);
-                //System.out.println(Arrays.deepToString(gameLogic));
-            }
-        });
-    }
-
     private VBox createMenu() {
         VBox menu = new VBox(20);
         menu.setAlignment(Pos.CENTER);
@@ -225,11 +122,295 @@ public class GUICreation extends Application {
         return menu;
     }
 
-    private void setAloneButtonAction(Button button) {
+    private GridPane createGameArea() {
 
-        button.setOnAction(event -> {
-            clearOldGame();
+        final int numCols = 3;
+        final int numRows = 3;
+        final int gameSize = 450;
+        final int cellSize = gameSize / 3;
+
+        GridPane game = new GridPane();
+
+        game.setMinSize(gameSize, gameSize);
+        game.setPadding(new Insets(10, 15, 15, 15));
+
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                Rectangle rec = new Rectangle(cellSize, cellSize);
+                GridPane.setRowIndex(rec, i);
+                GridPane.setColumnIndex(rec, j);
+                rec.setFill(Color.TRANSPARENT);
+                rec.setStroke(Color.WHITESMOKE);
+
+                Text recText = new Text();
+                GridPane.setRowIndex(recText, i);
+                GridPane.setColumnIndex(recText, j);
+
+                setCellAction(rec, recText);
+
+                game.getChildren().addAll(rec, recText);
+            }
+        }
+
+        return game;
+    }
+
+    private void setCellAction(Rectangle rec, Text recText) {
+
+        recText.setFont(Font.font(85));
+        recText.setFill(Color.WHITESMOKE);
+
+        rec.setOnMouseClicked(event -> {
+
+            if (event.getButton() == MouseButton.PRIMARY && blockX == false && recText.getText().isEmpty() && !gameFinished) {
+                recText.setText("  X");
+                int row = GridPane.getRowIndex(rec);
+                int col = GridPane.getColumnIndex(rec);
+
+                updateGameState(row, col, 'X');
+                checkGameState();
+
+                if (randomMode && !gameFinished) {
+                    System.out.println(cellsList);
+
+                    findRandomPlace("  O");
+
+                    checkGameState();
+                    blockO = true;
+
+                } else if (aiMode && !gameFinished) {
+                    System.out.println(cellsList);
+
+                    findBestPlace("  O");
+
+                    checkGameState();
+                    blockO = true;
+
+                } else if (!gameFinished) {
+                    blockX = true;
+                    blockO = false;
+                }
+
+            } else if (event.getButton() == MouseButton.SECONDARY && blockO == false && recText.getText().isEmpty() && !gameFinished) {
+                recText.setText("  O");
+                int row = GridPane.getRowIndex(rec);
+                int col = GridPane.getColumnIndex(rec);
+
+                updateGameState(row, col, 'O');
+                checkGameState();
+
+                if (randomMode && !gameFinished) {
+                    System.out.println(cellsList);
+
+                    findRandomPlace("  X");
+
+                    checkGameState();
+                    blockX = true;
+
+                } else if (aiMode && !gameFinished) {
+                    System.out.println(cellsList);
+
+                    checkGameState();
+                    blockX = true;
+
+                } else {
+                    blockX = false;
+                    blockO = true;
+                }
+                //System.out.println(i + "," + j);
+                //System.out.println(Arrays.deepToString(gameLogic));
+            }
         });
+    }
+
+    private void displayMessage(String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Message");
+        alert.setHeaderText("Game over!");
+        alert.setContentText(message);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("Styles.css").toExternalForm());
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                alert.close();
+            }
+        });
+    }
+
+    private void displayMove(int rowIndex, int colIndex, String text) {
+
+        Text recText = new Text();
+        recText.setFont(Font.font(85));
+        recText.setFill(Color.WHITESMOKE);
+        recText.setText(text);
+        GridPane.setRowIndex(recText, rowIndex);
+        GridPane.setColumnIndex(recText, colIndex);
+
+        game.getChildren().add(recText);
+    }
+
+    /*private void checkGameState1() {
+
+        boolean noTie = false;
+        //check rows
+        if (noTie == false) {
+            for (int row = 0; row < gameLogic.length; row++) {
+                if (gameLogic[row][0] != 0 && gameLogic[row][0] == gameLogic[row][1] && gameLogic[row][1] == gameLogic[row][2]) {
+                    if (gameLogic[row][0] == 'X') {
+                        displayMessage("Player X won!");
+                    } else {
+                        displayMessage("Player O won!");
+                    }
+                    noTie = true;
+                }
+            }
+        }
+
+        //check columns
+        if (noTie == false) {
+            for (int col = 0; col < gameLogic.length; col++) {
+                if (gameLogic[0][col] != 0 && gameLogic[0][col] == gameLogic[1][col] && gameLogic[1][col] == gameLogic[2][col]) {
+                    if (gameLogic[0][col] == 'X') {
+                        displayMessage("Player X won!");
+                    } else {
+                        displayMessage("Player O won!");
+                    }
+                    noTie = true;
+                }
+            }
+        }
+
+        //check diagonals
+        if (noTie == false) {
+            if (gameLogic[0][0] != 0 && gameLogic[0][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[2][2]) {
+                if (gameLogic[0][0] == 'X') {
+                    displayMessage("Player X won!");
+                } else {
+                    displayMessage("Player O won!");
+                }
+                noTie = true;
+            }
+        }
+
+        if (noTie == false) {
+            if (gameLogic[2][0] != 0 && gameLogic[2][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[0][2]) {
+                if (gameLogic[2][0] == 'X') {
+                    displayMessage("Player X won!");
+                } else {
+                    displayMessage("Player O won!");
+                }
+                noTie = true;
+            }
+        }
+
+        //check if there is a tie
+        if (noTie == false) {
+            int checkForTie = 0;
+            for (int row = 0; row < gameLogic.length; row++) {
+                for (int col = 0; col < gameLogic.length; col++) {
+                    if (gameLogic[row][col] != 0) {
+                        checkForTie++;
+                    }
+                }
+            }
+            if (checkForTie == 9) {
+                displayMessage("There was a tie!");
+                noTie = true;
+            }
+        }
+
+        if (noTie) {
+            gameFinished = true;
+        }
+    }*/
+    private void checkGameState() {
+        ComputerMove gameState = new ComputerMove();
+        String message = gameState.checkGameState(gameLogic);
+
+        if (message != "Game continues") {
+            displayMessage(message);
+            gameFinished = true;
+        }
+    }
+
+    private void updateGameState(int row, int col, char value) {
+        gameLogic[row][col] = value;
+
+        if (row == 0) {
+            cellsList.remove(new Integer(col));
+        } else if (row == 1) {
+            cellsList.remove(new Integer(col + 3));
+        } else if (row == 2) {
+            cellsList.remove(new Integer(col + 6));
+        }
+    }
+
+    private int[] convertToRowCol(int number) {
+        int[] rowCol = new int[2];
+        int row = 0;
+        int col = 0;
+
+        if (number < 3) {
+            row = 0;
+            if (number == 0) {
+                col = 0;
+            } else if (number == 1) {
+                col = 1;
+            } else if (number == 2) {
+                col = 2;
+            }
+        } else if (number >= 3 && number < 6) {
+            row = 1;
+            if (number == 3) {
+                col = 0;
+            } else if (number == 4) {
+                col = 1;
+            } else if (number == 5) {
+                col = 2;
+            }
+        } else if (number >= 6) {
+            row = 2;
+            if (number == 6) {
+                col = 0;
+            } else if (number == 7) {
+                col = 1;
+            } else if (number == 8) {
+                col = 2;
+            }
+        }
+        rowCol[0] = row;
+        rowCol[1] = col;
+
+        return rowCol;
+    }
+
+    private void findRandomPlace(String text) {
+        if (!cellsList.isEmpty()) {
+
+            ComputerMoveInterface computerMove = new ComputerMove();
+            int randomNumber = computerMove.randomMove(cellsList);
+
+            int[] rowCol = convertToRowCol(randomNumber);
+            int row = rowCol[0];
+            int col = rowCol[1];
+
+            System.out.println("Row: " + row + " Col: " + col);
+
+            updateGameState(row, col, text.charAt(text.length() - 1));
+            displayMove(row, col, text);
+        }
+    }
+
+    private void findBestPlace(String text) {
+
+        if (cellsList.isEmpty()) {
+            ComputerMoveInterface computerMove = new ComputerMove();
+            computerMove.bestMove(cellsList);
+
+        }
+
     }
 
     private void clearOldGame() {
@@ -256,169 +437,11 @@ public class GUICreation extends Application {
         System.out.println(cellsList);
     }
 
-    private void checkGameState() {
+    private void setAloneButtonAction(Button button) {
 
-        boolean noTie = false;
-        //check rows
-        if (noTie == false) {
-            for (int row = 0; row < gameLogic.length; row++) {
-                if (gameLogic[row][0] != 0 && gameLogic[row][0] == gameLogic[row][1] && gameLogic[row][1] == gameLogic[row][2]) {
-                    if (gameLogic[row][0] == 'X') {
-                        displayMessage("Player X won!");
-                    } else {
-                        displayMessage("Player O won!");
-                    }
-                    blockX = true;
-                    blockO = true;
-                    gameFinished = true;
-                    noTie = true;
-                }
-            }
-        }
-
-        //check columns
-        if (noTie == false) {
-            for (int col = 0; col < gameLogic.length; col++) {
-                if (gameLogic[0][col] != 0 && gameLogic[0][col] == gameLogic[1][col] && gameLogic[1][col] == gameLogic[2][col]) {
-                    if (gameLogic[0][col] == 'X') {
-                        displayMessage("Player X won!");
-                    } else {
-                        displayMessage("Player O won!");
-                    }
-                    blockX = true;
-                    blockO = true;
-                    gameFinished = true;
-                    noTie = true;
-                }
-            }
-        }
-
-        //check diagonals
-        if (noTie == false) {
-            if (gameLogic[0][0] != 0 && gameLogic[0][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[2][2]) {
-                if (gameLogic[0][0] == 'X') {
-                    displayMessage("Player X won!");
-                } else {
-                    displayMessage("Player O won!");
-                }
-                blockX = true;
-                blockO = true;
-                gameFinished = true;
-                noTie = true;
-            }
-        }
-
-        if (noTie == false) {
-            if (gameLogic[2][0] != 0 && gameLogic[2][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[0][2]) {
-                if (gameLogic[2][0] == 'X') {
-                    displayMessage("Player X won!");
-                } else {
-                    displayMessage("Player O won!");
-                }
-                blockX = true;
-                blockO = true;
-                gameFinished = true;
-                noTie = true;
-            }
-        }
-
-        //check if there is a tie
-        if (noTie == false) {
-            int checkForTie = 0;
-            for (int row = 0; row < gameLogic.length; row++) {
-                for (int col = 0; col < gameLogic.length; col++) {
-                    if (gameLogic[row][col] != 0) {
-                        checkForTie++;
-                    }
-                }
-            }
-            if (checkForTie == 9) {
-                displayMessage("There was a tie!");
-                gameFinished = true;
-            }
-        }
-    }
-
-    private void displayMessage(String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Message");
-        alert.setHeaderText("Game over!");
-        alert.setContentText(message);
-
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("Styles.css").toExternalForm());
-
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                alert.close();
-            }
+        button.setOnAction(event -> {
+            clearOldGame();
         });
-    }
-
-    private void updateCellList(int row, int col) {
-        if (row == 0) {
-            cellsList.remove(new Integer(col));
-        } else if (row == 1) {
-            cellsList.remove(new Integer(col + 3));
-        } else if (row == 2) {
-            cellsList.remove(new Integer(col + 6));
-        }
-    }
-
-    private void findRandomPlace(String text) {
-
-        ComputerMoveInterface computerMove = new ComputerMove();
-        int randomNumber = computerMove.randomMove(cellsList);
-
-        int row = 0;
-        int col = 0;
-        if (randomNumber < 3) {
-            row = 0;
-            if (randomNumber == 0) {
-                col = 0;
-            } else if (randomNumber == 1) {
-                col = 1;
-            } else if (randomNumber == 2) {
-                col = 2;
-            }
-        } else if (randomNumber >= 3 && randomNumber < 6) {
-            row = 1;
-            if (randomNumber == 3) {
-                col = 0;
-            } else if (randomNumber == 4) {
-                col = 1;
-            } else if (randomNumber == 5) {
-                col = 2;
-            }
-        } else if (randomNumber >= 6) {
-            row = 2;
-            if (randomNumber == 6) {
-                col = 0;
-            } else if (randomNumber == 7) {
-                col = 1;
-            } else if (randomNumber == 8) {
-                col = 2;
-            }
-        }
-        System.out.println("Row: " + row + " Col: " + col);
-
-        gameLogic[row][col] = text.charAt(text.length() - 1);
-        replaceTextNodes(row, col, text);
-        updateCellList(row, col);
-    }
-
-    private void replaceTextNodes(int rowIndex, int colIndex, String text) {
-        //game.getChildren().remove(nodeIndex); //możliwe, że niepotrzebne
-
-        Text recText = new Text();
-        recText.setFont(Font.font(85));
-        recText.setFill(Color.WHITESMOKE);
-        recText.setText(text);
-        GridPane.setRowIndex(recText, rowIndex);
-        GridPane.setColumnIndex(recText, colIndex);
-
-        //game.getChildren().add(nodeIndex, recText);
-        game.getChildren().add(recText);
     }
 
     private void setRandomFirstButtonAction(Button randomFirstButton) {
@@ -438,9 +461,8 @@ public class GUICreation extends Application {
 
             System.out.println(cellsList);
 
-            if (!cellsList.isEmpty()) {
-                findRandomPlace("  O");
-            }
+            findRandomPlace("  O");
+
             blockO = true;
         });
     }
@@ -459,6 +481,12 @@ public class GUICreation extends Application {
         aiSecondButton.setOnAction(event -> {
             clearOldGame();
             aiMode = true;
+
+            System.out.println(cellsList);
+
+            findRandomPlace("  O");
+
+            blockO = true;
         });
 
     }
