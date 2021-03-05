@@ -171,18 +171,14 @@ public class GUICreation extends Application {
                 checkGameState();
 
                 if (randomMode && !gameFinished) {
-                    System.out.println(cellsList);
 
                     findRandomPlace("  O");
-
                     checkGameState();
                     blockO = true;
 
                 } else if (aiMode && !gameFinished) {
-                    System.out.println(cellsList);
 
                     findBestPlace("  O");
-
                     checkGameState();
                     blockO = true;
 
@@ -200,16 +196,14 @@ public class GUICreation extends Application {
                 checkGameState();
 
                 if (randomMode && !gameFinished) {
-                    System.out.println(cellsList);
 
                     findRandomPlace("  X");
-
                     checkGameState();
                     blockX = true;
 
                 } else if (aiMode && !gameFinished) {
-                    System.out.println(cellsList);
 
+                    findBestPlace("  X");
                     checkGameState();
                     blockX = true;
 
@@ -217,8 +211,6 @@ public class GUICreation extends Application {
                     blockX = false;
                     blockO = true;
                 }
-                //System.out.println(i + "," + j);
-                //System.out.println(Arrays.deepToString(gameLogic));
             }
         });
     }
@@ -251,80 +243,6 @@ public class GUICreation extends Application {
         game.getChildren().add(recText);
     }
 
-    /*private void checkGameState1() {
-
-        boolean noTie = false;
-        //check rows
-        if (noTie == false) {
-            for (int row = 0; row < gameLogic.length; row++) {
-                if (gameLogic[row][0] != 0 && gameLogic[row][0] == gameLogic[row][1] && gameLogic[row][1] == gameLogic[row][2]) {
-                    if (gameLogic[row][0] == 'X') {
-                        displayMessage("Player X won!");
-                    } else {
-                        displayMessage("Player O won!");
-                    }
-                    noTie = true;
-                }
-            }
-        }
-
-        //check columns
-        if (noTie == false) {
-            for (int col = 0; col < gameLogic.length; col++) {
-                if (gameLogic[0][col] != 0 && gameLogic[0][col] == gameLogic[1][col] && gameLogic[1][col] == gameLogic[2][col]) {
-                    if (gameLogic[0][col] == 'X') {
-                        displayMessage("Player X won!");
-                    } else {
-                        displayMessage("Player O won!");
-                    }
-                    noTie = true;
-                }
-            }
-        }
-
-        //check diagonals
-        if (noTie == false) {
-            if (gameLogic[0][0] != 0 && gameLogic[0][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[2][2]) {
-                if (gameLogic[0][0] == 'X') {
-                    displayMessage("Player X won!");
-                } else {
-                    displayMessage("Player O won!");
-                }
-                noTie = true;
-            }
-        }
-
-        if (noTie == false) {
-            if (gameLogic[2][0] != 0 && gameLogic[2][0] == gameLogic[1][1] && gameLogic[1][1] == gameLogic[0][2]) {
-                if (gameLogic[2][0] == 'X') {
-                    displayMessage("Player X won!");
-                } else {
-                    displayMessage("Player O won!");
-                }
-                noTie = true;
-            }
-        }
-
-        //check if there is a tie
-        if (noTie == false) {
-            int checkForTie = 0;
-            for (int row = 0; row < gameLogic.length; row++) {
-                for (int col = 0; col < gameLogic.length; col++) {
-                    if (gameLogic[row][col] != 0) {
-                        checkForTie++;
-                    }
-                }
-            }
-            if (checkForTie == 9) {
-                displayMessage("There was a tie!");
-                noTie = true;
-            }
-        }
-
-        if (noTie) {
-            gameFinished = true;
-        }
-    }*/
     private void checkGameState() {
         ComputerMove gameState = new ComputerMove();
         String message = gameState.checkGameState(gameLogic);
@@ -347,70 +265,34 @@ public class GUICreation extends Application {
         }
     }
 
-    private int[] convertToRowCol(int number) {
-        int[] rowCol = new int[2];
-        int row = 0;
-        int col = 0;
-
-        if (number < 3) {
-            row = 0;
-            if (number == 0) {
-                col = 0;
-            } else if (number == 1) {
-                col = 1;
-            } else if (number == 2) {
-                col = 2;
-            }
-        } else if (number >= 3 && number < 6) {
-            row = 1;
-            if (number == 3) {
-                col = 0;
-            } else if (number == 4) {
-                col = 1;
-            } else if (number == 5) {
-                col = 2;
-            }
-        } else if (number >= 6) {
-            row = 2;
-            if (number == 6) {
-                col = 0;
-            } else if (number == 7) {
-                col = 1;
-            } else if (number == 8) {
-                col = 2;
-            }
-        }
-        rowCol[0] = row;
-        rowCol[1] = col;
-
-        return rowCol;
-    }
-
     private void findRandomPlace(String text) {
         if (!cellsList.isEmpty()) {
+            char sign = text.charAt(text.length() - 1);
 
             ComputerMoveInterface computerMove = new ComputerMove();
-            int randomNumber = computerMove.randomMove(cellsList);
+            int[] rowCol = computerMove.randomMove(cellsList);
 
-            int[] rowCol = convertToRowCol(randomNumber);
             int row = rowCol[0];
             int col = rowCol[1];
 
-            System.out.println("Row: " + row + " Col: " + col);
-
-            updateGameState(row, col, text.charAt(text.length() - 1));
+            updateGameState(row, col, sign);
             displayMove(row, col, text);
         }
     }
 
     private void findBestPlace(String text) {
+        if (!cellsList.isEmpty()) {
+            char sign = text.charAt(text.length() - 1);
 
-        if (cellsList.isEmpty()) {
             ComputerMoveInterface computerMove = new ComputerMove();
-            computerMove.bestMove(cellsList);
+            int[] rowCol = computerMove.bestMove(gameLogic, sign);
 
+            int row = rowCol[0];
+            int col = rowCol[1];
+
+            updateGameState(row, col, sign);
+            displayMove(row, col, text);
         }
-
     }
 
     private void clearOldGame() {
@@ -434,7 +316,6 @@ public class GUICreation extends Application {
         for (int i = 0; i < numberOfCells; i++) {
             cellsList.add(i);
         }
-        System.out.println(cellsList);
     }
 
     private void setAloneButtonAction(Button button) {
@@ -459,8 +340,6 @@ public class GUICreation extends Application {
             clearOldGame();
             randomMode = true;
 
-            System.out.println(cellsList);
-
             findRandomPlace("  O");
 
             blockO = true;
@@ -481,8 +360,6 @@ public class GUICreation extends Application {
         aiSecondButton.setOnAction(event -> {
             clearOldGame();
             aiMode = true;
-
-            System.out.println(cellsList);
 
             findRandomPlace("  O");
 
