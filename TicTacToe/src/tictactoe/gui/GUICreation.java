@@ -122,6 +122,44 @@ public class GUICreation extends Application {
         return menu;
     }
 
+    private void setAloneButtonAction(Button button) {
+        button.setOnAction(event -> {
+            clearOldGame();
+        });
+    }
+
+    private void setRandomFirstButtonAction(Button randomFirstButton) {
+        randomFirstButton.setOnAction(event -> {
+            clearOldGame();
+            randomMode = true;
+        });
+    }
+
+    private void setRandomSecondButtonAction(Button randomSecondButton) {
+        randomSecondButton.setOnAction(event -> {
+            clearOldGame();
+            findRandomPlace("  O");
+            randomMode = true;
+            blockO = true;
+        });
+    }
+
+    private void setAiFirstButtonAction(Button aiFirstButton) {
+        aiFirstButton.setOnAction(event -> {
+            clearOldGame();
+            aiMode = true;
+        });
+    }
+
+    private void setAiSecondButtonAciton(Button aiSecondButton) {
+        aiSecondButton.setOnAction(event -> {
+            clearOldGame();
+            findRandomPlace("  O");
+            aiMode = true;
+            blockO = true;
+        });
+    }
+
     private GridPane createGameArea() {
 
         final int numCols = 3;
@@ -151,7 +189,6 @@ public class GUICreation extends Application {
                 game.getChildren().addAll(rec, recText);
             }
         }
-
         return game;
     }
 
@@ -215,56 +252,6 @@ public class GUICreation extends Application {
         });
     }
 
-    private void displayMessage(String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Message");
-        alert.setHeaderText("Game over!");
-        alert.setContentText(message);
-
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("Styles.css").toExternalForm());
-
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                alert.close();
-            }
-        });
-    }
-
-    private void displayMove(int rowIndex, int colIndex, String text) {
-
-        Text recText = new Text();
-        recText.setFont(Font.font(85));
-        recText.setFill(Color.WHITESMOKE);
-        recText.setText(text);
-        GridPane.setRowIndex(recText, rowIndex);
-        GridPane.setColumnIndex(recText, colIndex);
-
-        game.getChildren().add(recText);
-    }
-
-    private void checkGameState() {
-        ComputerMove gameState = new ComputerMove();
-        String message = gameState.checkGameState(gameLogic);
-
-        if (message != "Game continues") {
-            displayMessage(message);
-            gameFinished = true;
-        }
-    }
-
-    private void updateGameState(int row, int col, char value) {
-        gameLogic[row][col] = value;
-
-        if (row == 0) {
-            cellsList.remove(new Integer(col));
-        } else if (row == 1) {
-            cellsList.remove(new Integer(col + 3));
-        } else if (row == 2) {
-            cellsList.remove(new Integer(col + 6));
-        }
-    }
-
     private void findRandomPlace(String text) {
         if (!cellsList.isEmpty()) {
             char sign = text.charAt(text.length() - 1);
@@ -295,6 +282,28 @@ public class GUICreation extends Application {
         }
     }
 
+    private void checkGameState() {
+        ComputerMove gameState = new ComputerMove();
+        String message = gameState.checkGameState(gameLogic);
+
+        if (!message.equals("Game continues")) {
+            displayMessage(message);
+            gameFinished = true;
+        }
+    }
+
+    private void updateGameState(int row, int col, char value) {
+        gameLogic[row][col] = value;
+
+        if (row == 0) {
+            cellsList.remove(new Integer(col));
+        } else if (row == 1) {
+            cellsList.remove(new Integer(col + 3));
+        } else if (row == 2) {
+            cellsList.remove(new Integer(col + 6));
+        }
+    }
+
     private void clearOldGame() {
 
         blockX = false;
@@ -318,53 +327,31 @@ public class GUICreation extends Application {
         }
     }
 
-    private void setAloneButtonAction(Button button) {
+    private void displayMove(int rowIndex, int colIndex, String text) {
 
-        button.setOnAction(event -> {
-            clearOldGame();
-        });
+        Text recText = new Text();
+        recText.setFont(Font.font(85));
+        recText.setFill(Color.WHITESMOKE);
+        recText.setText(text);
+        GridPane.setRowIndex(recText, rowIndex);
+        GridPane.setColumnIndex(recText, colIndex);
+
+        game.getChildren().add(recText);
     }
 
-    private void setRandomFirstButtonAction(Button randomFirstButton) {
+    private void displayMessage(String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Message");
+        alert.setHeaderText("Game over!");
+        alert.setContentText(message);
 
-        randomFirstButton.setOnAction(event -> {
-            clearOldGame();
-            randomMode = true;
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("Styles.css").toExternalForm());
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                alert.close();
+            }
         });
-
-    }
-
-    private void setRandomSecondButtonAction(Button randomSecondButton) {
-
-        randomSecondButton.setOnAction(event -> {
-            clearOldGame();
-            randomMode = true;
-
-            findRandomPlace("  O");
-
-            blockO = true;
-        });
-    }
-
-    private void setAiFirstButtonAction(Button aiFirstButton) {
-
-        aiFirstButton.setOnAction(event -> {
-            clearOldGame();
-            aiMode = true;
-        });
-
-    }
-
-    private void setAiSecondButtonAciton(Button aiSecondButton) {
-
-        aiSecondButton.setOnAction(event -> {
-            clearOldGame();
-            aiMode = true;
-
-            findRandomPlace("  O");
-
-            blockO = true;
-        });
-
     }
 }
