@@ -21,8 +21,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import tictactoe.computerMove.ComputerMove;
-import tictactoe.computerMove.ComputerMoveInterface;
+import tictactoe.computerAction.ComputerAction;
+import tictactoe.computerAction.ComputerActionInterface;
 
 public class GUICreation extends Application {
 
@@ -263,7 +263,7 @@ public class GUICreation extends Application {
         if (!cellsList.isEmpty()) {
             char sign = text.charAt(text.length() - 1);
 
-            ComputerMoveInterface computerMove = new ComputerMove();
+            ComputerActionInterface computerMove = new ComputerAction();
             int[] rowCol = computerMove.randomMove(cellsList);
 
             int row = rowCol[0];
@@ -278,7 +278,7 @@ public class GUICreation extends Application {
         if (!cellsList.isEmpty()) {
             char sign = text.charAt(text.length() - 1);
 
-            ComputerMoveInterface computerMove = new ComputerMove();
+            ComputerActionInterface computerMove = new ComputerAction();
             int[] rowCol = computerMove.bestMove(gameLogic, sign);
 
             int row = rowCol[0];
@@ -290,7 +290,7 @@ public class GUICreation extends Application {
     }
 
     private void checkGameState() {
-        ComputerMove gameState = new ComputerMove();
+        ComputerActionInterface gameState = new ComputerAction();
         String message = gameState.checkGameState(gameLogic);
 
         if (!message.equals("Game continues")) {

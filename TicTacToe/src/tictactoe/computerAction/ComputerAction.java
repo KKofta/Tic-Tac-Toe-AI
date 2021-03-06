@@ -1,10 +1,10 @@
-package tictactoe.computerMove;
+package tictactoe.computerAction;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ComputerMove implements ComputerMoveInterface {
+public class ComputerAction implements ComputerActionInterface {
 
     @Override
     public int[] randomMove(ArrayList<Integer> cellsList) {
@@ -79,6 +79,7 @@ public class ComputerMove implements ComputerMoveInterface {
         return new int[]{bestScore, bestRow, bestCol};
     }
 
+    @Override
     public String checkGameState(char[][] gameLogic) {
 
         String message = "Game continues";
