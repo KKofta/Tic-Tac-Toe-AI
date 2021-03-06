@@ -26,7 +26,7 @@ import tictactoe.computerMove.ComputerMoveInterface;
 
 public class GUICreation extends Application {
 
-    private final Stage window = new Stage();
+    private Stage window;
     private BorderPane layout;
     private GridPane game;
 
@@ -41,8 +41,8 @@ public class GUICreation extends Application {
     ArrayList<Integer> cellsList = new ArrayList<>();
 
     @Override
-    public void start(Stage stage) throws Exception {
-        stage = window;
+    public void start(Stage primaryStage) throws Exception {
+        window = primaryStage;
 
         layout = new BorderPane();
 
@@ -55,7 +55,7 @@ public class GUICreation extends Application {
         VBox menu = createMenu();
         layout.setRight(menu);
 
-        Scene scene = new Scene(layout, 650, 600);
+        Scene scene = new Scene(layout, 650, 525);
         scene.getStylesheets().add(getClass().getResource("Styles.css").toExternalForm());
 
         window.setTitle("TicTacToe with AI");
@@ -83,13 +83,14 @@ public class GUICreation extends Application {
         menu.setPadding(new Insets(10, 15, 15, 15));
 
         Button infoButton = new Button("Information");
+        setInfoButtonAction(infoButton);
 
         Button aloneButton = new Button("Play alone");
-        menu.setMargin(aloneButton, new Insets(100, 0, 0, 0));
+        menu.setMargin(aloneButton, new Insets(60, 0, 0, 0));
         aloneButton.setId("alone-button");
         setAloneButtonAction(aloneButton);
 
-        Label randomLabel = new Label("Play with random:");
+        Label randomLabel = new Label("Play with Random:");
         Button randomFirstButton = new Button("Go first");
         randomFirstButton.setId("randfirst-button");
         setRandomFirstButtonAction(randomFirstButton);
@@ -116,10 +117,16 @@ public class GUICreation extends Application {
         Button exitButton = new Button("Exit");
         exitButton.setOnAction(e -> window.close());
 
-        menu.setMargin(exitButton, new Insets(100, 0, 0, 0));
+        menu.setMargin(exitButton, new Insets(60, 0, 0, 0));
         menu.getChildren().addAll(infoButton, aloneButton, randomLabel, randomBox, aiLabel, aiBox, exitButton);
 
         return menu;
+    }
+
+    private void setInfoButtonAction(Button button) {
+        button.setOnAction(event -> {
+            displayInformation();
+        });
     }
 
     private void setAloneButtonAction(Button button) {
@@ -347,6 +354,31 @@ public class GUICreation extends Application {
 
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getStylesheets().add(getClass().getResource("Styles.css").toExternalForm());
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                alert.close();
+            }
+        });
+    }
+
+    private void displayInformation() {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Tic-Tac-Toe with AI");
+        alert.setHeaderText("Information");
+        alert.setContentText("Welcome to this incredible game in which you can train your skills to become a Tic-Tac-Toe master. "
+                + "If you want to play with X’s start game by clicking left mouse button, otherwise start with right mouse button.  You can choose between three modes:\n\n"
+                + "Play alone mode:\n"
+                + "•	You can play against yourself or against other person on the same device. \n"
+                + "•	One person has to play with right mouse buton and the other with the left one. \n\n"
+                + "Play with Random mode:\n"
+                + "•	You can play against computer which makes random moves.\n\n"
+                + "Play with AI mode:\n"
+                + "•	You can play against computer which makes intelligent moves calculated by \n        Minimax Algorithm. I dare you to win… or at least to tie.");
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("Styles.css").toExternalForm());
+        dialogPane.setMinSize(650, 525);
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
