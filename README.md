@@ -19,7 +19,7 @@ Tic-Tac-Toe with AI is a desktop application which allows user to play the game 
 
 In project I used following algorithm:
 
-* <a href="https://en.wikipedia.org/wiki/Minimax">Minimax Algorithm</a> - calculating best possible computer move.;
+* <a href="https://en.wikipedia.org/wiki/Minimax">Minimax Algorithm</a> - calculating best possible computer move.
 
 #### Preview
 
@@ -56,8 +56,13 @@ In order to run application locally you must have installed `JRE 8`.
 
 ### Screenshots
 
+* Main page:
 <img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/master/Preview/View.png">
+
+* Message after gameplay:
 <img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/master/Preview/Message.png">
+
+* Gameplay information page:
 <img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/master/Preview/Information.png">
 
 ---
