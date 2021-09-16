@@ -29,7 +29,7 @@ In project I used following algorithm:
 
 ### Motivation
 
-App was create in order to expand Java & JavaFX knowladge, learn about Minimax Algorithm and applying it into desktop application. 
+App was created in order to expand Java & JavaFX knowladge, learn about Minimax Algorithm and applying it into desktop application. 
 
 ---
 
