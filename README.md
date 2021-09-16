@@ -23,7 +23,7 @@ In project I used following algorithm:
 
 #### Preview
 
-<img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/main/Preview/Preview.gif">
+<img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/master/Preview/Preview.gif">
 
 ---
 
@@ -56,8 +56,8 @@ In order to run application locally you must have installed `JRE 8`.
 
 ### Screenshots
 
-<img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/main/Preview/View.png">
-<img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/main/Preview/Message.png">
-<img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/main/Preview/Information.png">
+<img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/master/Preview/View.png">
+<img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/master/Preview/Message.png">
+<img src="https://github.com/KKofta/Tic-Tac-Toe-AI/blob/master/Preview/Information.png">
 
 ---
